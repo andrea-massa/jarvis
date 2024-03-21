@@ -68,9 +68,7 @@ async function startListening(){
 
 
 function stopListening(){
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        mediaRecorder.stop();               
-    }
+    mediaRecorder.stop();               
 }
 
 
