@@ -1,40 +1,83 @@
 let audioStream;
+let recordedChunks = [];
+let mediaRecorder;
+
 
 
 $(document).ready(function () {
-    
+    const startBtn = $('#start-btn');
+    const stopBtn = $('#stop-btn');
+    const playBtn = $('#play-btn');
+
+
+
     // Start listening when the start btn is clicked
-    $('#start_btn').click(function (e) { 
+    startBtn.click((e) =>{ 
         startListening()
-        $(this).attr('disabled', true);        
-        $('#stop_btn').removeAttr('disabled');
+        startBtn.attr('disabled', true);       
+        stopBtn.removeAttr('disabled');
     });
 
 
 
     // Stop listening when the stop btn is clicked
-    $('#stop_btn').click(function (e) { 
+    stopBtn.click((e) => { 
         stopListening()
-        $(this).attr('disabled', true);        
-        $('#start_btn').removeAttr('disabled');
+        stopBtn.attr('disabled', true);        
+        startBtn.removeAttr('disabled');
+        playBtn.removeAttr('disabled');
     });
+
+
+
+    // Playback audio when the play btn is clicked
+    playBtn.click(playBackAudio)
 });
 
 
 
-
-
+// Function that starts to listen once is called, saves the content into recorded chunks global variable
 async function startListening(){
     try {
         audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        recordedChunks = []        
+        mediaRecorder = new MediaRecorder(audioStream);
+
+        mediaRecorder.ondataavailable = event => {
+            recordedChunks.push(event.data);
+        };
+    
+        mediaRecorder.onstop = () => {
+            $('#stop-btn').attr('disabled', 'true');
+        };
+    
+        mediaRecorder.onerror = error => {
+            console.error('Error while recording:', error);
+        };
+    
+        mediaRecorder.onwarning = warning => {
+            console.warn('Warning while recording:', warning);
+        };
+
+        mediaRecorder.start();
     } catch (error) {
         console.error('Error accessing microphone:', error);
     }
 }
 
-async function stopListening(){
-    if (audioStream) {
-        audioStream.getTracks().forEach(track => track.stop());
+
+
+function stopListening(){
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();               
     }
-    console.log('Audio Stream')
+}
+
+
+
+function playBackAudio(){
+    const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const audioElement = new Audio(audioUrl);
+    audioElement.play();   
 }
