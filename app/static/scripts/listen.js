@@ -31,7 +31,7 @@ $(document).ready(function () {
 
 
     // Playback audio when the play btn is clicked
-    playBtn.click(playBackAudio)
+    playBtn.click(sendAudioToAPI)
 });
 
 
@@ -73,9 +73,40 @@ function stopListening(){
 
 
 
-function playBackAudio(){
-    const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
-    const audioUrl = URL.createObjectURL(audioBlob);
-    const audioElement = new Audio(audioUrl);
-    audioElement.play();   
+// function playBackAudio(){
+//     const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+//     const audioUrl = URL.createObjectURL(audioBlob);
+//     const audioElement = new Audio(audioUrl);
+//     audioElement.play();   
+// }
+
+
+
+async function sendAudioToAPI(){
+    console.log('send audio 2 called')
+
+    let audioData = new FormData();
+    recordedChunks.forEach((element, index) => {
+        audioData.append(`audioChunk_${index}`, element)
+    })        
+
+    await $.ajaxSetup({
+        beforeSend: (xhr, settings) => {
+            xhr.setRequestHeader('X-CSRFToken', 'QhbVEms2fgG8ybWdwANh6omjfwc1smeN')
+        }
+    });
+
+    await $.ajax({
+        type: "POST",
+        url: "api/speech_to_text/",
+        data: audioData,        
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            console.log('Audio Sent to API Successfully')
+        },
+        error: function (xhr, status, error) {
+            console.error('Error Uploading audio: ', error)
+        }
+    });
 }
