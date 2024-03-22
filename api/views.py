@@ -5,7 +5,8 @@ from django.http import JsonResponse, HttpResponseBadRequest
 
 # An endpoint translating speech to text and returning JSON with the text 
 def speech_to_text(request):    
-    return 'txt'
+    print(request)
+    return JsonResponse({'data': 'data'})
 
 # An endpoint translating text to speech and returning AUDIO
 def text_to_speech(request):

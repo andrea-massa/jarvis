@@ -85,23 +85,24 @@ function stopListening(){
 async function sendAudioToAPI(){
     console.log('send audio 2 called')
 
+
     let audioData = new FormData();
     recordedChunks.forEach((element, index) => {
         audioData.append(`audioChunk_${index}`, element)
     })        
 
-    await $.ajaxSetup({
-        beforeSend: (xhr, settings) => {
-            xhr.setRequestHeader('X-CSRFToken', 'QhbVEms2fgG8ybWdwANh6omjfwc1smeN')
-        }
-    });
+    let csrftoken = jQuery("[name=csrfmiddlewaretoken]").val()
+    console.log(csrftoken)
 
     await $.ajax({
         type: "POST",
         url: "api/speech_to_text/",
-        data: audioData,        
+        data: audioData,
         processData: false,
         contentType: false,
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
         success: function (response) {
             console.log('Audio Sent to API Successfully')
         },
