@@ -26,7 +26,7 @@ def speech_to_text(request):
             audio_content = audio_chunks['audioChunk_0'].read()
 
         # Create a directory to save audio chunk to a file
-        save_dir = './api/temp_audio_files'
+        save_dir = './api/temp_audio_files/'
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
         
@@ -34,6 +34,7 @@ def speech_to_text(request):
         save_path = os.path.join(save_dir, 'audio.wav')
         with open(save_path, 'wb') as f:
             f.write(audio_content)
+
 
     return JsonResponse({'data': 'data'})
 

@@ -1,3 +1,5 @@
 # Ignore virtual environment
 env/
 
+# Ignore temporary folder for audio files
+api/temp_audio_files
