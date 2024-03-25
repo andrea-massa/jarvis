@@ -23,16 +23,17 @@ def speech_to_text(request):
             for chunk in audio_chunks:                
                 audio_content += chunk.read()
         else:
-            print(type(audio_chunks['audioChunk_0']))
             audio_content = audio_chunks['audioChunk_0'].read()
-        
 
-        # Save audio into a temporary WAV file
-        with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_audio_file:
-            temp_audio_file.write(audio_content)
-            temp_audio_file_path = temp_audio_file.name
-
+        # Create a directory to save audio chunk to a file
+        save_dir = './api/temp_audio_files'
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
         
+        # Save audio to file in that directory
+        save_path = os.path.join(save_dir, 'audio.wav')
+        with open(save_path, 'wb') as f:
+            f.write(audio_content)
 
     return JsonResponse({'data': 'data'})
 
