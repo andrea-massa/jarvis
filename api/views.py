@@ -1,9 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponseBadRequest
-import json
-import tempfile
+import assemblyai as aai
 import os
-import speech_recognition as sr
 
 # Create your views here.
 
@@ -11,22 +9,6 @@ import speech_recognition as sr
 
 # An endpoint translating speech to text and returning JSON with the text 
 def speech_to_text(request):    
-
-
-    def transcribe_file(filepath):
-
-        try:
-            r = sr.Recognizer()                            
-            with sr.AudioFile(filepath) as source:
-                audio = r.record(source)
-                result = r.recognize_google(audio)
-                return result
-
-        except sr.UnknownValueError:
-            return 'ERROR: Could Not Understand Audio'
-        except sr.RequestError as e:
-            return 'ERROR: {error}'.format(e)
-
 
     if request.method == "POST":
 
@@ -55,7 +37,10 @@ def speech_to_text(request):
         # Transcribe the file to text
         transcription = transcribe_file(save_path)
 
-    return JsonResponse({'data': 'data'})
+        # Format and send response
+        return JsonResponse({'text': transcription})
+
+
 
 
 
@@ -65,7 +50,31 @@ def text_to_speech(request):
 
 
 
+
+
 # An endpoint to send messages to ChatGPT
 def sendToChatGpt(request):
     return 'txt'
     
+
+
+
+
+
+
+
+
+# ---------------------------HELPER FUNCTIONS ------------------------------------------
+
+# A function that transcribes a .wav file to text using assemblyai API
+def transcribe_file(filepath):
+    # Set up the transcriber with aai
+    aai.settings.api_key = os.environ.get('ASSEMBLY_AI_API_KEY')
+    transcriber = aai.Transcriber()
+    transcript = transcriber.transcribe(filepath)
+
+    # Handle errors in the transcription and return result
+    if transcript.status == aai.TranscriptStatus.error:
+        return('ERROR: '.format(transcript.error))
+    else:
+        return(transcript.text)

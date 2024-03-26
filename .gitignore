@@ -2,4 +2,8 @@
 env/
 
 # Ignore temporary folder for audio files
-api/temp_audio_files
+/api/temp_audio_files/audio.wav
+
+# Ignore the api keys file
+api_keys.sh
+
