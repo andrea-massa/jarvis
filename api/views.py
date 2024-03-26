@@ -12,6 +12,22 @@ import speech_recognition as sr
 # An endpoint translating speech to text and returning JSON with the text 
 def speech_to_text(request):    
 
+
+    def transcribe_file(filepath):
+
+        try:
+            r = sr.Recognizer()                            
+            with sr.AudioFile(filepath) as source:
+                audio = r.record(source)
+                result = r.recognize_google(audio)
+                return result
+
+        except sr.UnknownValueError:
+            return 'ERROR: Could Not Understand Audio'
+        except sr.RequestError as e:
+            return 'ERROR: {error}'.format(e)
+
+
     if request.method == "POST":
 
         # Access all the audio chunks in the request body 
@@ -32,9 +48,12 @@ def speech_to_text(request):
         
         # Save audio to file in that directory
         save_path = os.path.join(save_dir, 'audio.wav')
+        print('Save Path: ', save_path)
         with open(save_path, 'wb') as f:
             f.write(audio_content)
 
+        # Transcribe the file to text
+        transcription = transcribe_file(save_path)
 
     return JsonResponse({'data': 'data'})
 
