@@ -8,6 +8,6 @@ Python 3.12.2
 
 ## Packages required:
 - Django             5.0.3
-- SpeechRecognition  3.10.1
+- assemblyai         0.23.11
 - pyttsx3            2.90
 - openai             1.14.0
