@@ -3,6 +3,7 @@ from django.conf import settings
 from django.http import JsonResponse, HttpResponseBadRequest
 import assemblyai as aai
 import os
+import shutil
 
 
 # Create your views here.
@@ -40,6 +41,9 @@ def speech_to_text(request):
 
         # Transcribe the file to text using helper function
         transcription = transcribe_file(save_path)
+
+        # Delete the temp_audio_files folder
+        delete_directory(save_dir)
 
         # Format and send response
         return JsonResponse({'text': transcription})
@@ -87,3 +91,14 @@ def transcribe_file(filepath):
         return('ERROR: '.format(transcript.error))
     else:
         return(transcript.text)
+
+
+
+# A function that deletes a directory and it's content recursively given a path
+def delete_directory(directory_path):
+    try:        
+        shutil.rmtree(directory_path)
+        return True
+    except OSError as e:
+        print(f"Error: {e.strerror}")
+        return False
