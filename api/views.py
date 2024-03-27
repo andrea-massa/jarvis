@@ -1,7 +1,9 @@
 from django.shortcuts import render
+from django.conf import settings
 from django.http import JsonResponse, HttpResponseBadRequest
 import assemblyai as aai
 import os
+
 
 # Create your views here.
 
@@ -24,22 +26,20 @@ def speech_to_text(request):
             audio_content = audio_chunks['audioChunk_0'].read()
 
         # Create a directory to save audio chunk to a file
-        save_dir = './api/temp_audio_files/'
-        if not os.path.exists(save_dir):
-            os.makedirs(save_dir)
-        
+        save_dir = os.path.join(settings.MEDIA_ROOT, 'temp_audio_files')
+        os.makedirs(save_dir, exist_ok=True)
+
         # Save audio to file in that directory
         save_path = os.path.join(save_dir, 'audio.wav')
-        print('Save Path: ', save_path)
         with open(save_path, 'wb') as f:
             f.write(audio_content)
 
-        # Transcribe the file to text
+        # Transcribe the file to text using helper function
         transcription = transcribe_file(save_path)
 
         # Format and send response
         return JsonResponse({'text': transcription})
-
+    
 
 
 
