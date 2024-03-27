@@ -12,10 +12,14 @@ import os
 # An endpoint translating speech to text and returning JSON with the text 
 def speech_to_text(request):    
 
+
     if request.method == "POST":
 
-        # Access all the audio chunks in the request body 
+        # Access all the audio chunks in the request body, throw error if no data provided or data is not audio
+        if not (bool(request.FILES)):
+            return JsonResponse({'error': 'Incorrect data format provided or no data provided for request'}, status=415)
         audio_chunks = request.FILES
+        
         
         # Save the audio content in a single variable
         audio_content = b''        
@@ -39,7 +43,12 @@ def speech_to_text(request):
 
         # Format and send response
         return JsonResponse({'text': transcription})
-    
+
+
+    # Handle case where request method is not POST
+    else:
+        return JsonResponse({'error': 'Only POST requests are supported for speech_to_text endpoint'}, status=405)
+
 
 
 
